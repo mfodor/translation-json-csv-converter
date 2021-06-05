@@ -5,7 +5,7 @@ const CSV_TO_JSON = 'CSV2JSON';
 
 const params = {
     direction: JSON_TO_CSV,
-    source: '',
+    source: 'i18n',
     target: 'translations.csv',
     verbose: 0,
     delimiter: ','
@@ -47,6 +47,7 @@ function processArgs(args) {
                 setTarget(args.shift());
                 break;
 
+            case 'delimiter':
             case 's':
                 setDelimiter(args.shift());
                 break;
@@ -88,7 +89,7 @@ function setDirection(direction) {
  */
 function setSource(source) {
     if (!source || !fs.existsSync(source)) {
-        console.log('Directory not provided or not exists: %s!', source);
+        console.log('Source not provided or not exists: %s!', source);
         process.exit(2);
     }
     params.source = source;
@@ -99,7 +100,7 @@ function setSource(source) {
  */
 function setTarget(target) {
     if (!target || !fs.existsSync(target)) {
-        console.log('Directory not provided or not exists: %s!', target);
+        console.log('Target not provided or not exists: %s!', target);
         process.exit(2);
     }
     params.target = target;
