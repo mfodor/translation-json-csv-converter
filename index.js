@@ -1,4 +1,4 @@
-const {processArgs, JSON_TO_CSV, CSV_TO_JSON} = require("./parseParams");
+const {processArgs, JSON_TO_CSV, CSV_TO_JSON} = require("./app/parseParams");
 
 const args = process.argv.slice(2);
 const params = processArgs(args);
@@ -9,11 +9,11 @@ let converterClass;
 
 switch (params.direction) {
     case JSON_TO_CSV:
-        converterClass = require('./converter/jsonToCsv');
+        converterClass = require('./app/converter/jsonToCsv');
         break;
 
     case CSV_TO_JSON:
-        converterClass = require('./converter/csvToJson');
+        converterClass = require('./app/converter/csvToJson');
         break;
 }
 
