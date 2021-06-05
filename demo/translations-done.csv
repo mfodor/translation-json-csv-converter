@@ -1,0 +1,7 @@
+Translation ID;EN translations;HU translations
+dir/name;"Hello, ""World""!";Helló, Világ!
+dir/error.notFound;Not found!;Nem található!
+dir/error.serverError;Server error!;Szerver hiba!
+dir/error.forbidden;Forbidden!;Megtagadva!
+common.yes;Yes;Igen
+common.no;No;Nem

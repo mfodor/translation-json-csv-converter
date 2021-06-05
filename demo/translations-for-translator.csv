@@ -1,0 +1,7 @@
+Translation ID,EN translations,HU translations
+dir/name,"Hello, ""World""!",
+dir/error.notFound,Not found!,
+dir/error.serverError,Server error!,
+dir/error.forbidden,Forbidden!,
+common.yes,Yes,
+common.no,No,
