@@ -1,0 +1,23 @@
+{
+  "name": "translation-json-csv-converter",
+  "version": "1.0.0",
+  "description": "Translation JSON to CSV and back to JSON converter",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "translation",
+    "language",
+    "csv",
+    "json",
+    "converter",
+    "flatten"
+  ],
+  "author": "mfodor",
+  "license": "MIT",
+  "dependencies": {
+    "csv": "^5.5.0",
+    "flat": "^5.0.2"
+  }
+}
