@@ -44,7 +44,7 @@ JsonToCsvConverter.prototype.run = function () {
     logger.log(1, '%d languages found.', languages.length);
     logger.log(2, 'languages found:', languages);
 
-    const translations = loadTranslations(files, languages);
+    const translations = loadTranslations(files, languages, this.source);
     logger.log(1, 'All translations loaded.');
     logger.log(3, 'All, flattened translations:', translations);
 
@@ -79,20 +79,23 @@ function discoverJsonFiles(directory) {
 
 /**
  * @param {string} file
+ * @param {string} rootPath
  * @return {Object}
  */
-function readJsonFile(file) {
+function readJsonFile(file, rootPath) {
     const translations = JSON.parse(fs.readFileSync(file));
     const flatObj = flatten(translations);
-    return prefixObject(flatObj, file);
+    return prefixObject(flatObj, file, rootPath);
 }
 
 /**
  * @param {Object} obj
  * @param {string} path
+ * @param {string} rootPath
  * @return {Object}
  */
-function prefixObject(obj, path) {
+function prefixObject(obj, path, rootPath) {
+    path = path.replace(`${rootPath}`, '');
     const pathParts = path.split('/');
     pathParts.shift(); // root dir
     pathParts.pop(); // JSON file
@@ -136,16 +139,17 @@ function getLangFromFilePath(path) {
 /**
  * @param {string[]} files
  * @param {string[]} languages
+ * @param {string} rootPath
  * @return {Object}
  */
-function loadTranslations(files, languages) {
+function loadTranslations(files, languages, rootPath) {
     const translations = {};
     languages.forEach(lang => (translations[lang] = {}));
     files.forEach(file => {
         const lang = getLangFromFilePath(file);
         translations[lang] = {
             ...translations[lang],
-            ...readJsonFile(file)
+            ...readJsonFile(file, rootPath)
         };
     }, {});
     return translations;
