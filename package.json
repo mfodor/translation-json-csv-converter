@@ -1,6 +1,6 @@
 {
   "name": "translation-json-csv-converter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Translation JSON to CSV and back to JSON converter",
   "main": "index.js",
   "scripts": {
