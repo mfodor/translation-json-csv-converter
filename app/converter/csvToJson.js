@@ -142,7 +142,7 @@ function persistTranslationFile(translations, path) {
     fs.mkdirSync(dir.join('/'), { recursive: true })
 
     if (fs.existsSync(path)) {
-        const current = JSON.parse(fs.readFileSync(file));
+        const current = JSON.parse(fs.readFileSync(path));
         translations = merge.recursive(true, current, translations);
     }
 
