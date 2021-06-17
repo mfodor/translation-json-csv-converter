@@ -1,6 +1,7 @@
 const fs = require('fs')
 const parseCsv = require('csv-parse/lib/sync')
-var unflatten = require('flat').unflatten
+const unflatten = require('flat').unflatten
+const merge = require('merge')
 
 const { CSV_TO_JSON } = require('../parseParams')
 const Logger = require('../logger')
@@ -139,7 +140,13 @@ function persistTranslationFile(translations, path) {
     const dir = path.split('/');
     dir.pop();
     fs.mkdirSync(dir.join('/'), { recursive: true })
-    fs.writeFileSync(path, JSON.stringify(translations, void 0, 2));
+
+    if (fs.existsSync(path)) {
+        const current = JSON.parse(fs.readFileSync(file));
+        translations = merge.recursive(true, current, translations);
+    }
+
+    fs.writeFileSync(path, JSON.stringify(translations, void 0, 2) + '\n');
 }
 
 module.exports = CsvToJsonConverter;
