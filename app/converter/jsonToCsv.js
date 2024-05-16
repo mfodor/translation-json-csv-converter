@@ -17,11 +17,15 @@ function JsonToCsvConverter(params) {
         source: './',
         target: 'translations.csv',
         verbose: 0,
-        delimiter: ','
+        delimiter: ',',
+        encoding: null,
+        bom: false
     }
     this.source = params.source;
     this.target = params.target;
     this.delimiter = params.delimiter;
+    this.encoding = params.encoding;
+    this.bom = params.bom;
     logger = new Logger(params.verbose, LOG_PREFIX);
 }
 
@@ -44,7 +48,7 @@ JsonToCsvConverter.prototype.run = function () {
     logger.log(1, '%d languages found.', languages.length);
     logger.log(2, 'languages found:', languages);
 
-    const translations = loadTranslations(files, languages, this.source);
+    const translations = loadTranslations(files, languages, this.source, this.encoding, this.bom);
     logger.log(1, 'All translations loaded.');
     logger.log(3, 'All, flattened translations:', translations);
 
@@ -82,8 +86,9 @@ function discoverJsonFiles(directory) {
  * @param {string} rootPath
  * @return {Object}
  */
-function readJsonFile(file, rootPath) {
-    const translations = JSON.parse(fs.readFileSync(file));
+function readJsonFile(file, rootPath, encoding, bom) {
+    const fileContent = encoding ? fs.readFileSync(file, "utf8") : fs.readFileSync(file);
+    const translations = JSON.parse(bom ? fileContent.replace(/^\uFEFF/, '') : fileContent);
     const flatObj = flatten(translations);
     return prefixObject(flatObj, file, rootPath);
 }
@@ -142,14 +147,14 @@ function getLangFromFilePath(path) {
  * @param {string} rootPath
  * @return {Object}
  */
-function loadTranslations(files, languages, rootPath) {
+function loadTranslations(files, languages, rootPath, encoding, bom) {
     const translations = {};
     languages.forEach(lang => (translations[lang] = {}));
     files.forEach(file => {
         const lang = getLangFromFilePath(file);
         translations[lang] = {
             ...translations[lang],
-            ...readJsonFile(file, rootPath)
+            ...readJsonFile(file, rootPath, encoding, bom)
         };
     }, {});
     return translations;

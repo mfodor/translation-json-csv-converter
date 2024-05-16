@@ -24,7 +24,9 @@ node index.js [options]
   "source": "i18n",
   "target": "translations.csv",
   "delimiter": ",",
-  "verbose": 0
+  "verbose": 0,
+  "encoding": null,
+  "array-handling": "array"
 }
 ```
 
@@ -99,6 +101,49 @@ Examples:
 ```bash
 node index.js s ';'
 ```
+
+#### Encoding
+
+Encoding and BOM Handling for JSON parsing / writing. By adding "-bom" to the encoding the BOM will be stripped / added to the JSON file.
+
+Option: `Encoding`  
+Aliases: `e`  
+Values: null | 'ascii' | 'base64' | 'base64url' | 'hex' | 'ucs2' | 'ucs-2' | 'utf16le' | 'utf-16le' | 'utf8' | 'utf-8' | 'binary' | 'latin1'  
+Default: null
+
+Examples:
+```bash
+node index.js e utf8-bom
+```
+
+#### ArrayHandling
+
+This option decides how numeric leaf nodes will be handled. If set to 'array' (default), these nodes will be handled as an array. If set to 'object', these nodes will be handled as properties of an object.
+
+Option: `array-handling`  
+Aliases: `arr`  
+Value: 'array' | 'object'  
+Default: 'array'
+
+Examples:
+```bash
+node index.js array-handling object
+
+# CSV:
+# 'hello.you.0': 'ipsum',
+# 'hello.you.1': 'lorem',
+# 'hello.other.world': 'foo'
+
+# JSON:
+# hello: {
+#     you: {
+#         0: 'ipsum',
+#         1: 'lorem',
+#     },
+#     other: { world: 'foo' }
+# }
+```
+
 #### Verbosity
 
 The script outputs error messages and a final success message by default.

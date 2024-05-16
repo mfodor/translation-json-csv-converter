@@ -52,6 +52,16 @@ function processArgs(args) {
                 setDelimiter(args.shift());
                 break;
 
+            case 'encoding':
+            case 'e':
+                setEncoding(args.shift());
+                break;
+
+            case 'array-handling':
+            case 'arr':
+                setArrayHandling(args.shift());
+                break;
+
             case 'v':
                 params.verbose = 1;
                 break;
@@ -117,11 +127,49 @@ function setDelimiter(delimiter) {
     params.delimiter = delimiter;
 }
 
+/**
+ * @param {string} encoding
+ */
+function setEncoding(encoding) {
+    if (!encoding || encoding.length < 1) {
+        console.log('Encoding not provided: %s!', encoding);
+        process.exit(2);
+    }
+    params.bom = encoding.endsWith("-bom");
+    if (!params.bom)
+        params.encoding = encoding;
+    else if (encoding.length > 4)
+        params.encoding = encoding.substring(0, encoding.length - 4);
+}
+
+/**
+ * @param {string} encoding
+ */
+function setArrayHandling(arrayHandling) {
+    if (!arrayHandling || arrayHandling.length < 1) {
+        console.log('ArrayHandling not provided: %s!', arrayHandling);
+        process.exit(2);
+    }
+    const validTrueValues = ["object"];
+    const validFalseValues = ["array"];
+    if (validTrueValues.includes(arrayHandling))
+        params.arrayHandling = "object";
+    else if(validFalseValues.includes(arrayHandling))
+        params.arrayHandling = "array";
+    else {
+        console.log('ArrayHandling is not valid: %s! Valid options are: %s', arrayHandling, validTrueValues.concat(validFalseValues).join(", "));
+        process.exit(2);
+    }
+}
+
 function validate() {
     if (params.direction === JSON_TO_CSV) {
         if (!params.source || !fs.existsSync(params.source) || !fs.lstatSync(params.source).isDirectory()) {
             console.log('Source must be a directory containing the translation JSON files!');
             process.exit(4);
+        }
+        if (params.arrayHandling) {
+            console.log('ArrayHandling is not valid for this direction and will be ignored!');
         }
     } else {
         if (!params.source || !fs.existsSync(params.source) || !fs.lstatSync(params.source).isFile()) {
