@@ -20,10 +20,16 @@ function CsvToJsonConverter(params) {
         target: './',
         verbose: 0,
         delimiter: ',',
+        encoding: null,
+        bom: false,
+        arrayHandling: "array"
     }
     this.source = params.source;
     this.target = params.target;
     this.delimiter = params.delimiter;
+    this.encoding = params.encoding;
+    this.bom = params.bom;
+    this.arrayHandling = params.arrayHandling || "array";
     logger = new Logger(params.verbose, LOG_PREFIX);
 }
 
@@ -48,11 +54,11 @@ CsvToJsonConverter.prototype.run = function () {
     logger.log(1, 'Languages discovered.');
     logger.log(2, 'Discovered languages:', languages);
 
-    const translations = parseRows(rows, languages);
+    const translations = parseRows(rows, languages, this.arrayHandling);
     logger.log(1, 'Translations parsed.');
     logger.log(3, 'Translations:', translations);
 
-    persistTranslations(translations, this.target);
+    persistTranslations(translations, this.target, this.encoding, this.bom);
     logger.log(0, 'Translations written to JSON files into folder %s', this.target);
 }
 
@@ -82,7 +88,7 @@ function discoverLanguages(headerRow) {
  * @param {string[]} languages
  * @return {Object}
  */
-function parseRows(rows, languages) {
+function parseRows(rows, languages, arrayHandling) {
     const translations = {};
 
     languages.forEach(lang => translations[lang] = {})
@@ -99,7 +105,7 @@ function parseRows(rows, languages) {
         })
     });
 
-    return unflatten(translations);
+    return unflatten(translations, {object: arrayHandling === "object"});
 }
 
 /**
@@ -117,13 +123,13 @@ function parseFolderFromTrKey(key) {
  * @param {string} path
  * @return {void}
  */
-function persistTranslations(translations, path) {
+function persistTranslations(translations, path, encoding, bom) {
     Object.keys(translations).forEach(lang => {
-        persistTranslationFile(translations[lang].root, [path, `${lang}.json`].join('/'))
+        persistTranslationFile(translations[lang].root, [path, `${lang}.json`].join('/'), encoding, bom)
         delete translations[lang].root;
 
         Object.keys(translations[lang]).forEach(dir => {
-            persistTranslationFile(translations[lang][dir], [path, dir, `${lang}.json`].join('/'))
+            persistTranslationFile(translations[lang][dir], [path, dir, `${lang}.json`].join('/'), encoding, bom)
         })
     })
 }
@@ -133,7 +139,7 @@ function persistTranslations(translations, path) {
  * @param {string} path
  * @return {void}
  */
-function persistTranslationFile(translations, path) {
+function persistTranslationFile(translations, path, encoding, bom) {
     if (!translations) {
         return;
     }
@@ -146,7 +152,7 @@ function persistTranslationFile(translations, path) {
         translations = merge.recursive(true, current, translations);
     }
 
-    fs.writeFileSync(path, JSON.stringify(translations, void 0, 2) + '\n');
+    fs.writeFileSync(path, (bom ? "\uFEFF" : "") + JSON.stringify(translations, void 0, 2) + '\n', {encoding: encoding});
 }
 
 module.exports = CsvToJsonConverter;
